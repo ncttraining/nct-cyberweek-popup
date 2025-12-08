@@ -45,11 +45,11 @@ jQuery(document).ready(function($) {
         $button.prop('disabled', true).text('Applying...');
         
         $.ajax({
-            url: cyberWeekAjax.ajax_url,
+            url: winterSaleAjax.ajax_url,
             type: 'POST',
             data: {
-                action: 'apply_cyber_week_discount',
-                nonce: cyberWeekAjax.nonce
+                action: 'apply_winter_sale_discount',
+                nonce: winterSaleAjax.nonce
             },
             success: function(response) {
                 if (response.success) {
