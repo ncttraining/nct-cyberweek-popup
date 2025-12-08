@@ -1,6 +1,6 @@
 <div id="cw-banner" class="cw-banner">
     <div class="cw-banner-content">
-        <span class="cw-banner-text">❄️ WINTER SALE! Get 20% OFF Everything! ❄️</span>
+        <span class="cw-banner-text">❄️ WINTER SALE! Get 15% OFF Everything! ❄️</span>
         <button id="cw-banner-btn" class="cw-banner-btn">Shop Now</button>
     </div>
 </div>
@@ -12,7 +12,7 @@
             <h2>❄️ Winter Sale Special! ❄️</h2>
             <p class="cw-popup-subtitle">Limited Time Offer</p>
             <div class="cw-discount-badge">
-                <span class="cw-discount-percent">20%</span>
+                <span class="cw-discount-percent">15%</span>
                 <span class="cw-discount-text">OFF</span>
             </div>
             <p class="cw-popup-description">Use code <strong>WINTERSALE</strong> at checkout</p>
