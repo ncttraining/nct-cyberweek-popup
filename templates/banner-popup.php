@@ -1,10 +1,13 @@
 <div id="cw-banner" class="cw-banner">
     <div class="cw-banner-content">
         <span class="cw-banner-text">❄️ WINTER SALE! Get 15% OFF Everything! ❄️</span>
+        <?php if (!is_user_logged_in()) : ?>
         <button id="cw-banner-btn" class="cw-banner-btn">Shop Now</button>
+        <?php endif; ?>
     </div>
 </div>
 
+<?php if (!is_user_logged_in()) : ?>
 <div id="cw-popup-overlay" class="cw-popup-overlay">
     <div class="cw-popup">
         <button class="cw-popup-close">&times;</button>
@@ -21,3 +24,4 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
