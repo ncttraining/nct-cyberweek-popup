@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Cyber Week Discount Banner
- * Description: Displays a Cyber Week discount banner and popup for WooCommerce
+ * Plugin Name: Winter Sale Discount Banner
+ * Description: Displays a Winter Sale discount banner and popup for WooCommerce
  * Version: 1.1
  * Author: Your Name
  */
@@ -11,24 +11,24 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Cyber_Week_Discount {
-    
-    private $coupon_code = 'CYBERWEEK';
+class Winter_Sale_Discount {
+
+    private $coupon_code = 'WINTERSALE';
     
     public function __construct() {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_footer', array($this, 'render_banner_and_popup'));
-        add_action('wp_ajax_apply_cyber_week_discount', array($this, 'apply_discount'));
-        add_action('wp_ajax_nopriv_apply_cyber_week_discount', array($this, 'apply_discount'));
+        add_action('wp_ajax_apply_winter_sale_discount', array($this, 'apply_discount'));
+        add_action('wp_ajax_nopriv_apply_winter_sale_discount', array($this, 'apply_discount'));
     }
     
     public function enqueue_scripts() {
-        wp_enqueue_style('cyber-week-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.1');
-        wp_enqueue_script('cyber-week-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.1', true);
-        
-        wp_localize_script('cyber-week-script', 'cyberWeekAjax', array(
+        wp_enqueue_style('winter-sale-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.1');
+        wp_enqueue_script('winter-sale-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.1', true);
+
+        wp_localize_script('winter-sale-script', 'winterSaleAjax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('cyber_week_nonce')
+            'nonce' => wp_create_nonce('winter_sale_nonce')
         ));
     }
     
@@ -42,7 +42,7 @@ class Cyber_Week_Discount {
     }
     
     public function apply_discount() {
-        check_ajax_referer('cyber_week_nonce', 'nonce');
+        check_ajax_referer('winter_sale_nonce', 'nonce');
         
         if (!class_exists('WooCommerce')) {
             wp_send_json_error(array('message' => 'WooCommerce is not active'));
@@ -63,7 +63,7 @@ class Cyber_Week_Discount {
             
             if ($applied) {
                 wp_send_json_success(array(
-                    'message' => 'Cyber Week discount applied!',
+                    'message' => 'Winter Sale discount applied!',
                     'coupon_code' => $this->coupon_code
                 ));
             } else {
@@ -83,4 +83,4 @@ class Cyber_Week_Discount {
 }
 
 // Initialize the plugin
-new Cyber_Week_Discount();
+new Winter_Sale_Discount();
