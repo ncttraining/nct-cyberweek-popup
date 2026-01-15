@@ -20,7 +20,7 @@
             </div>
             <p class="cw-popup-description">Use code <strong>WINTERSALE</strong> at checkout</p>
             <button id="cw-apply-discount" class="cw-apply-btn">APPLY DISCOUNT NOW</button>
-            <p class="cw-popup-terms">*Valid on all products. Hurry, offer ends soon!</p>
+            <p class="cw-popup-terms">*Valid on all products. Does not include examination resits. Hurry, offer ends soon!</p>
         </div>
     </div>
 </div>
