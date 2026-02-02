@@ -45,11 +45,11 @@ jQuery(document).ready(function($) {
         $button.prop('disabled', true).text('Applying...');
         
         $.ajax({
-            url: winterSaleAjax.ajax_url,
+            url: nctDiscountAjax.ajax_url,
             type: 'POST',
             data: {
-                action: 'apply_winter_sale_discount',
-                nonce: winterSaleAjax.nonce
+                action: 'apply_nct_discount',
+                nonce: nctDiscountAjax.nonce
             },
             success: function(response) {
                 if (response.success) {
