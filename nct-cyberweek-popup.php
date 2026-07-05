@@ -37,7 +37,20 @@ class NCT_Discount {
         if (is_admin()) {
             return;
         }
-        
+
+        // Hide for logged-in users
+        if (is_user_logged_in()) {
+            return;
+        }
+
+        // Hide on cart and checkout pages
+        if (function_exists('is_cart') && is_cart()) {
+            return;
+        }
+        if (function_exists('is_checkout') && is_checkout()) {
+            return;
+        }
+
         include plugin_dir_path(__FILE__) . 'templates/banner-popup.php';
     }
     
