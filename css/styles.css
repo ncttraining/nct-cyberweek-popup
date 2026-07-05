@@ -1,20 +1,20 @@
 /* Banner Styles */
 .cw-banner {
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
     background: #1a4d4d; /* Updated to match your color swatch */
     color: white;
     padding: 15px 20px;
     z-index: 9998;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    animation: slideDown 0.5s ease;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    animation: slideUp 0.5s ease;
 }
 
-@keyframes slideDown {
+@keyframes slideUp {
     from {
-        transform: translateY(-100%);
+        transform: translateY(100%);
     }
     to {
         transform: translateY(0);
@@ -214,28 +214,23 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .cw-banner {
-        top: auto;
-        bottom: 0;
-    }
-    
     .cw-banner-text {
         font-size: 14px;
     }
-    
+
     .cw-banner-btn {
         padding: 8px 20px;
         font-size: 14px;
     }
-    
+
     .cw-popup {
         padding: 30px 20px;
     }
-    
+
     .cw-popup-content h2 {
         font-size: 24px;
     }
-    
+
     .cw-discount-percent {
         font-size: 36px;
     }

@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Winter Sale Discount Banner
- * Description: Displays a Winter Sale discount banner and popup for WooCommerce
- * Version: 1.1
+ * Plugin Name: NCT Discount Banner
+ * Description: Displays a discount banner and popup for WooCommerce
+ * Version: 1.3
  * Author: Your Name
  */
 
@@ -11,24 +11,24 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Winter_Sale_Discount {
+class NCT_Discount {
 
-    private $coupon_code = 'WINTERSALE';
-    
+    private $coupon_code = 'NCT10';
+
     public function __construct() {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_footer', array($this, 'render_banner_and_popup'));
-        add_action('wp_ajax_apply_winter_sale_discount', array($this, 'apply_discount'));
-        add_action('wp_ajax_nopriv_apply_winter_sale_discount', array($this, 'apply_discount'));
+        add_action('wp_ajax_apply_nct_discount', array($this, 'apply_discount'));
+        add_action('wp_ajax_nopriv_apply_nct_discount', array($this, 'apply_discount'));
     }
-    
-    public function enqueue_scripts() {
-        wp_enqueue_style('winter-sale-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.1');
-        wp_enqueue_script('winter-sale-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.1', true);
 
-        wp_localize_script('winter-sale-script', 'winterSaleAjax', array(
+    public function enqueue_scripts() {
+        wp_enqueue_style('nct-discount-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.3');
+        wp_enqueue_script('nct-discount-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.3', true);
+
+        wp_localize_script('nct-discount-script', 'nctDiscountAjax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('winter_sale_nonce')
+            'nonce' => wp_create_nonce('nct_discount_nonce')
         ));
     }
     
@@ -37,33 +37,46 @@ class Winter_Sale_Discount {
         if (is_admin()) {
             return;
         }
-        
+
+        // Hide for logged-in users
+        if (is_user_logged_in()) {
+            return;
+        }
+
+        // Hide on cart and checkout pages
+        if (function_exists('is_cart') && is_cart()) {
+            return;
+        }
+        if (function_exists('is_checkout') && is_checkout()) {
+            return;
+        }
+
         include plugin_dir_path(__FILE__) . 'templates/banner-popup.php';
     }
     
     public function apply_discount() {
-        check_ajax_referer('winter_sale_nonce', 'nonce');
-        
+        check_ajax_referer('nct_discount_nonce', 'nonce');
+
         if (!class_exists('WooCommerce')) {
             wp_send_json_error(array('message' => 'WooCommerce is not active'));
             return;
         }
-        
+
         // Check if coupon exists
         $coupon = new WC_Coupon($this->coupon_code);
-        
+
         if (!$coupon->get_id()) {
             wp_send_json_error(array('message' => 'Coupon does not exist'));
             return;
         }
-        
+
         // Apply coupon to cart
         if (WC()->cart) {
             $applied = WC()->cart->apply_coupon($this->coupon_code);
-            
+
             if ($applied) {
                 wp_send_json_success(array(
-                    'message' => 'Winter Sale discount applied!',
+                    'message' => 'Discount applied!',
                     'coupon_code' => $this->coupon_code
                 ));
             } else {
@@ -83,4 +96,4 @@ class Winter_Sale_Discount {
 }
 
 // Initialize the plugin
-new Winter_Sale_Discount();
+new NCT_Discount();
