@@ -2,7 +2,7 @@
 /**
  * Plugin Name: NCT Discount Banner
  * Description: Displays a discount banner and popup for WooCommerce
- * Version: 1.3
+ * Version: 1.4
  * Author: Your Name
  */
 
@@ -23,8 +23,8 @@ class NCT_Discount {
     }
 
     public function enqueue_scripts() {
-        wp_enqueue_style('nct-discount-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.3');
-        wp_enqueue_script('nct-discount-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.3', true);
+        wp_enqueue_style('nct-discount-styles', plugin_dir_url(__FILE__) . 'css/styles.css', array(), '1.4');
+        wp_enqueue_script('nct-discount-script', plugin_dir_url(__FILE__) . 'js/script.js', array('jquery'), '1.4', true);
 
         wp_localize_script('nct-discount-script', 'nctDiscountAjax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
