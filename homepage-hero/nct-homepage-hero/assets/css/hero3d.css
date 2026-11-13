@@ -1,0 +1,9 @@
+/* NCT homepage hero: 3D stage. Scoped to the theme's hero (.hero-art) so it wins over the theme's own rules
+   whatever order the stylesheets are combined in. Nothing here applies until hero3d.js adds .has-3d. */
+.hero-art .fig-stage{grid-template-rows:auto auto}
+.hero-art .h3d{grid-area:1/1;position:relative;aspect-ratio:1/0.82;display:none}
+.hero-art.has-3d .h3d{display:block}
+.hero-art .h3d canvas{position:absolute;left:-24%;top:-26%;width:148%;height:126%;display:block;touch-action:pan-y;cursor:grab}
+.hero-art.has-3d .hero-fig{grid-area:2/1}
+.hero-art.has-3d .hero-fig svg{display:none}
+@media (max-width:860px){.hero-art .h3d canvas{left:-8%;width:116%;top:-10%;height:116%}}
