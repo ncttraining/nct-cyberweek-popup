@@ -1,0 +1,11 @@
+/* NCT Hero 3D: the only style rules this plugin adds. They apply once the 3D stage is running (.has-3d);
+   if it cannot run, the theme's own illustrations show exactly as before. */
+.hero .has-3d .fig-stage{grid-template-rows:auto auto}
+.hero .h3d{grid-area:1/1;position:relative;aspect-ratio:1/0.82;display:none}
+.hero .has-3d .h3d{display:block}
+.hero .h3d canvas{position:absolute;left:-24%;top:-26%;width:148%;height:126%;max-width:none;display:block;touch-action:pan-y;cursor:grab}
+.hero .h3d canvas:active{cursor:grabbing}
+.hero .has-3d .hero-fig{grid-area:2/1}
+.hero .has-3d .hero-fig svg{display:none}
+.hero .has-3d .art-cap{margin-top:0}
+@media (max-width:860px){.hero .h3d canvas{left:-8%;width:116%;top:-10%;height:116%}}

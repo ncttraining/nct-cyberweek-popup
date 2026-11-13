@@ -1,8 +1,16 @@
 /* NCT homepage hero: 3D stage that replaces the flat illustrations. Needs three.js r128 and GLTFLoader loaded first.
    The original SVG figures stay in the page and are shown again if WebGL is not available. */
 (function () {
-  var art = document.querySelector('.hero-art'), box = document.getElementById('h3d'), canvas = document.getElementById('h3d-canvas');
-  if (!art || !box || !canvas) return;
+  var art = document.querySelector('.hero .hero-art'), figStage = art && art.querySelector('.fig-stage');
+  if (!art || !figStage) return;
+  // Add the 3D stage ahead of the theme's own figures; nothing in the theme has to change
+  var box = document.getElementById('h3d'), canvas;
+  if (!box) {
+    box = document.createElement('div'); box.className = 'h3d'; box.id = 'h3d';
+    canvas = document.createElement('canvas'); canvas.id = 'h3d-canvas'; canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', '3D model of the selected training area. Drag to turn it.');
+    box.appendChild(canvas); figStage.insertBefore(box, figStage.firstChild);
+  } else canvas = document.getElementById('h3d-canvas');
   var CFG = window.NCTHero3D || {};
   // One scene per tab, in tab order. yaw = resting angle; loop = motion repeats (wheels) instead of going back and forth.
   var SCENES = [
@@ -18,6 +26,7 @@
   function mark(i) {
     tabs.forEach(function (t, n) { t.classList.toggle('is-active', n === i); t.setAttribute('aria-pressed', String(n === i)); });
     figs.forEach(function (f, n) { f.classList.toggle('is-active', n === i); f.hidden = n !== i; });
+    current = i;
   }
 
   if (!window.THREE || !THREE.GLTFLoader) return;
@@ -132,9 +141,9 @@
     if (shown) shown.g.visible = false;
     shown = m; m.g.visible = true; road.visible = !!m.s.road; dirty = true;
   }
-  function select(i) {
+  function select(i, themeDidIt) {
     if (i === current && shown) return;
-    current = i; mark(i);
+    current = i; if (!themeDidIt) mark(i);
     pending = i;
     if (reduce) { load(i, function (m) { if (pending === i) { yaw = yawGoal = m.s.yaw; show(m); } }); return; }
     // The table spins once; the outgoing model shrinks away and the new one grows in half-way round
@@ -143,7 +152,14 @@
     swapAt = performance.now();
     load(i);
   }
-  tabs.forEach(function (t, n) { t.addEventListener('click', function () { select(n); }); });
+  // Follow whichever tab is active. The theme switches tabs itself (on click and on its own timer), so watch for that;
+  // if no theme script is handling the tabs, switch them here.
+  function activeTab() { for (var n = 0; n < tabs.length; n++) if (tabs[n].classList.contains('is-active')) return n; return 0; }
+  if (window.MutationObserver) {
+    var mo = new MutationObserver(function () { var n = activeTab(); if (n !== current) select(n, true); });
+    tabs.forEach(function (t) { mo.observe(t, { attributes: true, attributeFilter: ['class'] }); });
+  }
+  tabs.forEach(function (t, n) { t.addEventListener('click', function () { setTimeout(function () { if (activeTab() !== n) mark(n); if (current !== n) select(n, true); }, 0); }); });
 
   var last = performance.now();
   function frame(now) {
@@ -175,10 +191,10 @@
     requestAnimationFrame(frame);
   }
 
-  mark(0);
-  load(0, function (m) { show(m); });
+  current = activeTab();
+  load(current, function (m) { if (!shown) { yaw = yawGoal = m.s.yaw; show(m); } });
   requestAnimationFrame(frame);
   // Fetch the other scenes one at a time once the first is up, so switching is instant
-  SCENES.forEach(function (s, n) { if (n) setTimeout(function () { load(n); }, 1200 + n * 900); });
+  SCENES.forEach(function (s, n) { setTimeout(function () { load(n); }, 1200 + n * 900); });
   window.__hero3d = { select: select, ready: function (i) { return !!loaded[i]; } };
 })();
