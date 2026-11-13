@@ -1,0 +1,11 @@
+/* Showcase view: loaded after finder.css. The truck stands on a turntable drawn straight onto the plum, with no scene box. */
+#nctf.nctf-showcase .nctf-stage{min-height:600px;margin-left:-4%}
+#nctf.nctf-showcase .nctf-stage canvas{-webkit-mask-image:none;mask-image:none;touch-action:pan-y}
+#nctf.nctf-showcase .nctf-stage-note{left:auto;right:var(--gutter-r);top:auto;bottom:20px}
+#nctf.nctf-showcase .nctf-stage-step{top:20px;bottom:auto}
+@media (max-width:899px){
+  #nctf.nctf-showcase .nctf-stage{min-height:0;margin-left:0;height:360px}
+  #nctf.nctf-showcase .nctf-stage canvas{inset:0;height:100%}
+  #nctf.nctf-showcase .nctf-stage-step{top:12px}
+  #nctf.nctf-showcase .nctf-stage-note{right:auto;left:var(--gutter);bottom:10px;max-width:none}
+}

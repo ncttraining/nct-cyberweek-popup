@@ -1,7 +1,7 @@
 === NCT Truck Finder ===
 Requires at least: 5.8
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 
 Interactive 3D "Which truck do you need training on?" selector for National Compliance Training.
 
@@ -18,6 +18,19 @@ read how to recognise it, try its controls and go to the matching course page.
    "forklift-training" as soon as the plugin is active.
 
 To remove it from that page, deactivate the plugin. Nothing is written to the database or to the page's content.
+
+== Two views ==
+
+Showcase (the default): each truck stands on a turntable, as in the homepage hero. Visitors pick a truck, read
+how to recognise it, drag to turn it, and go to the course page. Each truck gently works through its own motion.
+
+Interactive: the same trucks in a marked bay with a steering wheel or tiller, pedal and hydraulic levers.
+
+To make interactive the default, add to the theme's functions.php:
+
+    add_filter( 'nct_truck_finder_mode', function () { return 'interactive'; } );
+
+Or choose per placement with the shortcode: [nct_truck_finder mode="interactive"] or [nct_truck_finder mode="showcase"].
 
 == Using it elsewhere ==
 
