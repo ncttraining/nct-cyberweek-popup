@@ -13,7 +13,10 @@ and from `truck-finder/`.
 
 On the front page only, `nct-homepage-hero.php` loads, in this order:
 
-1. `assets/css/hero3d.css`: the few layout rules the stage needs, scoped to `.hero-art`.
+1. `assets/css/hero3d.css`: the few layout rules the stage needs, scoped to `.hero-art`. The stage is laid over the
+   illustration it replaces (which is hidden but keeps its space), so nothing in the hero moves when 3D switches
+   on. The mockup's rules moved the caption block to a second grid row, which measured as a layout shift (CLS) of
+   0.17 on desktop.
 2. `assets/js/three.min.js` and `GLTFLoader.js` (three.js r128).
 3. `assets/js/hero3d-stage.js`: adds `<div class="h3d" id="h3d"><canvas id="h3d-canvas">` as the first child of the
    theme's `.fig-stage`.
