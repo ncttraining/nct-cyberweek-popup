@@ -34,6 +34,15 @@ PALETTE = {
     "wood":    ("#CDAA78", 0.0, 0.85, {}),                # pallets
     "decal":   ("#FDFBFC", 0.0, 0.50, {}),                # white data plates / stripes
     "hazard":  ("#F2C200", 0.0, 0.50, {}),                # yellow warning marks
+    # added for the homepage hero scenes
+    "red":     ("#D3222B", 0.0, 0.38, {"coat": 0.8}),     # fire equipment red
+    "green":   ("#16834A", 0.0, 0.45, {"coat": 0.5}),     # first aid green
+    "white":   ("#F5F3F0", 0.0, 0.45, {"coat": 0.4}),     # white paint / plastic
+    "cream":   ("#FBF1E4", 0.0, 0.55, {}),                # trailer body, fabric, dressings
+    "brass":   ("#C9A24A", 0.9, 0.30, {}),                # valves, fittings
+    "black":   ("#0F0E10", 0.0, 0.45, {}),                # hoses, gauges, trim
+    "plum":    ("#43003F", 0.0, 0.55, {}),                # brand plum, for panels and signs
+    "screen":  ("#BFE8D2", 0.0, 0.25, {"emit": ("#8FE0B8", 0.8)}),  # lit display
 }
 _mats = {}
 
