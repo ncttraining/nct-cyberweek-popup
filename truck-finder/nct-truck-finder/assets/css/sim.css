@@ -1,0 +1,32 @@
+/* Simulator page: loaded after finder.css. A wide yard view with the truck controls along its bottom edge. */
+#nctf.nctf-sim{overflow:visible}
+#nctf.nctf-sim .nctf-sim-head{max-width:1440px;margin:0 auto;padding:36px var(--gutter-r) 22px var(--gutter);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 40px}
+#nctf.nctf-sim .nctf-title{margin:0 0 8px;color:var(--white);font-weight:800;font-size:clamp(30px,3.3vw,48px);line-height:1.04;letter-spacing:-.03em}
+#nctf.nctf-sim .nctf-lede{margin:0;max-width:620px}
+#nctf.nctf-sim .nctf-sim-task{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#nctf.nctf-sim .nctf-task{margin:0;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+#nctf.nctf-sim .nctf-tabs{max-width:1440px;margin:0 auto;border-bottom:1px solid var(--rule)}
+#nctf.nctf-sim .nctf-tab{min-height:48px}
+#nctf.nctf-sim .nctf-stage{position:relative;margin:0;min-height:0;height:clamp(540px,calc(100vh - 150px),820px);overflow:hidden}
+#nctf.nctf-sim .nctf-stage canvas{-webkit-mask-image:none;mask-image:none}
+#nctf.nctf-sim .nctf-stage-note{left:var(--gutter);top:16px;bottom:auto}
+@media (max-width:1250px){#nctf.nctf-sim .nctf-stage-note{display:none}}
+#nctf.nctf-sim .nctf-stage-step{top:16px}
+#nctf.nctf-sim .nctf-hint{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:2;margin:0;max-width:min(520px,60%);padding:9px 16px;background:var(--plum-deep);border:1px solid var(--orange);border-radius:2px;font-size:15px;font-weight:600;text-align:center}
+#nctf.nctf-sim .nctf-hint:empty{display:none}
+#nctf.nctf-sim .nctf-controls{left:50%;right:auto;transform:translateX(-50%);width:min(760px,calc(100% - 2 * var(--gutter)))}
+#nctf.nctf-sim .nctf-sim-info{max-width:1440px;margin:0 auto;padding:30px var(--gutter-r) 40px var(--gutter);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr) minmax(0,4fr);gap:24px 48px;align-items:start;border-top:4px solid var(--orange)}
+#nctf.nctf-sim .nctf-sim-info h2{margin:0;font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-.02em;color:var(--white)}
+#nctf.nctf-sim .nctf-sim-info .nctf-aka{margin:4px 0 12px;font-size:15px;color:var(--pale)}
+#nctf.nctf-sim .nctf-actions{flex-direction:column;align-items:flex-start}
+#nctf.nctf-sim .nctf-callus{font-size:14px;line-height:1.5}
+@media (max-width:899px){
+  #nctf.nctf-sim .nctf-sim-head{padding-top:28px}
+  #nctf.nctf-sim .nctf-stage{height:auto}
+  #nctf.nctf-sim .nctf-stage canvas{position:absolute;inset:0 0 auto 0;height:380px}
+  #nctf.nctf-sim .nctf-controls{position:static;transform:none;width:auto;margin:380px 0 0}
+  #nctf.nctf-sim .nctf-hint{transform:none;left:var(--gutter);right:var(--gutter);max-width:none;top:318px}
+  #nctf.nctf-sim .nctf-stage-step{top:12px}
+  #nctf.nctf-sim .nctf-stage-note{display:none}
+  #nctf.nctf-sim .nctf-sim-info{grid-template-columns:minmax(0,1fr)}
+}

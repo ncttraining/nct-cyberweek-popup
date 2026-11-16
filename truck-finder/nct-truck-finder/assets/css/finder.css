@@ -101,3 +101,6 @@
   #nctf .nctf-stage-note{max-width:200px}
   #nctf .nctf-info{order:4;padding:24px var(--gutter-r) 36px var(--gutter)}
 }
+
+#nctf .nctf-btn-ghost{border-color:var(--white);color:var(--white);background:transparent}
+#nctf .nctf-btn-ghost:hover{background:var(--white);color:var(--plum)}

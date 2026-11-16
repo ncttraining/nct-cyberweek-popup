@@ -1,4 +1,4 @@
-/* NCT Truck Finder: 3D truck selector with working controls. Needs three.js r128 and its GLTFLoader, loaded before this file. */
+/* NCT Truck Simulator: drive each truck round a yard and move pallets with it. Needs three.js r128 and its GLTFLoader, loaded before this file. */
 (function () {
   var root = document.getElementById('nctf');
   if (!root) return;
@@ -120,7 +120,7 @@
 
   function lin(c) { return new THREE.Color(c).convertSRGBToLinear(); }
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(lin(PLUM), 20, 36);
+  scene.fog = new THREE.Fog(lin(PLUM), 26, 48);
   var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 
   // Studio reflections: a small lit room baked into an environment map
@@ -142,7 +142,7 @@
   var sun = new THREE.DirectionalLight(0xfff6ea, 1.5);
   sun.position.set(5, 10, 5); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -8; sun.shadow.camera.right = 8; sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -8;
+  sun.shadow.camera.left = -12; sun.shadow.camera.right = 12; sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
   sun.shadow.camera.near = 1; sun.shadow.camera.far = 28; sun.shadow.bias = -0.0004; sun.shadow.radius = 5;
   scene.add(sun);
 
@@ -249,17 +249,105 @@
   floor.rotation.x = -Math.PI / 2; scene.add(floor);
   var shade = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.42, fog: false }));
   shade.rotation.x = -Math.PI / 2; shade.position.y = 0.008; shade.receiveShadow = true; scene.add(shade);
-  var bw = 4.2, bd = 6.4, lw = 0.12, i;
-  paint(bw, lw, 0xFB8E28, 0, -bd / 2 + 0.4); paint(bw, lw, 0xFB8E28, 0, bd / 2 + 0.4);
-  paint(lw, bd, 0xFB8E28, -bw / 2, 0.4); paint(lw, bd, 0xFB8E28, bw / 2, 0.4);
-  for (i = 0; i < 7; i++) paint(0.16, 2.3, 0xEED4E9, -5.2 + i * 0.55, 3.2, Math.PI / 4);
-  paint(0.12, 14, 0xEED4E9, 3.9, -1); paint(0.12, 14, 0xEED4E9, 5.1, -1);
-  paint(4.2, lw, MAG, 0, -5.4); paint(4.2, lw, MAG, 0, -4.9);
+  // The yard: a pick-up area on the left, three marked bays on the right, racking with two free slots at the back
+  var lw = 0.12, i;
+  var YARD = { x: 7.4, zMax: 7.0 };
+  for (i = 0; i < 9; i++) paint(0.14, 1.5, 0xEED4E9, -7.4 + i * 0.5, 6.4, Math.PI / 4);        // hatched edge by the pick-up area
+  paint(0.12, 13.4, 0xEED4E9, -3.6, 0.2); paint(0.12, 13.4, 0xEED4E9, 3.6, 0.2);                  // lane lines
+  paint(7.3, lw, MAG, -0.2, -6.55);                                                              // rack approach line
+  var goals = [];
+  function bay(x, z) {            // a square painted on the floor that changes colour when a pallet is set down in it
+    var mt = new THREE.MeshBasicMaterial({ color: lin(0xFB8E28), toneMapped: false }), w = 1.9;
+    [[w, lw, 0, -w / 2], [w, lw, 0, w / 2], [lw, w, -w / 2, 0], [lw, w, w / 2, 0]].forEach(function (q) {
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(q[0], q[1]), mt); m.rotation.x = -Math.PI / 2; m.position.set(x + q[2], 0.005, z + q[3]); scene.add(m);
+    });
+    goals.push({ x: x, z: z, y: 0, mat: mt });
+  }
+  bay(5.5, -2.7); bay(5.5, 0); bay(5.5, 2.7);
+  var PICKUP = [[-5.5, -2.7], [-5.5, 0], [-5.5, 2.7], [-5.5, 5.2]];
+  PICKUP.forEach(function (q) { paint(1.5, 0.08, 0x7A3F77, q[0], q[1] - 0.85); paint(1.5, 0.08, 0x7A3F77, q[0], q[1] + 0.85); });
   var rack = group(scene, -0.2, 0, -7.6), p, s;
   for (p = 0; p < 4; p++) [0.5, -0.5].forEach(function (z) { box(0.1, 5.5, 0.08, M.rackU, -3.6 + p * 2.4, 2.75, z, rack); });
   for (p = 0; p < 4; p++) for (s = 0; s < 5; s++) { var br = box(0.03, 0.03, 1.25, M.rackU, -3.6 + p * 2.4, 0.6 + s * 1.05, 0, rack); br.rotation.x = s % 2 ? 0.7 : -0.7; }
   for (s = 0; s < 4; s++) [0.5, -0.5].forEach(function (z) { box(7.3, 0.12, 0.06, M.rackB, 0, 1.2 + s * 1.3, z, rack); });
   [[-2.4, 0], [0, 0], [-2.4, 1], [2.4, 1], [0, 2], [2.4, 2], [-2.4, 3], [0, 3]].forEach(function (l) { pallet(rack, l[0], l[1] === 0 ? 0 : 1.2 + (l[1] - 1) * 1.3 + 0.06, 0); });
+  // Two rack positions are left empty for pallets to be put away in: one at floor level, one on the first beam
+  var SLOTS = [{ x: 2.2, y: 0, z: -7.6, taken: null }, { x: -0.2, y: 1.26, z: -7.6, taken: null }];
+  SLOTS.forEach(function (sl) {
+    var mt = new THREE.MeshBasicMaterial({ color: lin(0xFB8E28), toneMapped: false });
+    var m = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.03, 0.05), mt); m.position.set(sl.x, sl.y + (sl.y ? 0.075 : 0.02), sl.z + 0.56); scene.add(m);
+    sl.mat = mt; goals.push(sl);
+  });
+
+  // ---- Pallets are separate objects in the yard, not part of the truck
+  var pallets = [], carry = null, proto = null, lastH = 0, fp = new THREE.Vector3(), fq = new THREE.Quaternion(), UP = new THREE.Vector3(0, 1, 0);
+  var PAL_RE = /^(pallet|pal|pal_front|pal_rear|cartons)$/;
+  function setPalletPose(pl) { pl.o.position.set(pl.x, pl.y, pl.z); pl.o.quaternion.setFromAxisAngle(UP, pl.yaw); }
+  function resetYard() {
+    if (!proto) return;
+    carry = null; SLOTS.forEach(function (sl) { sl.taken = null; });
+    PICKUP.forEach(function (q, n) {
+      var pl = pallets[n];
+      if (!pl) { pl = { o: proto.clone(true) }; scene.add(pl.o); pallets.push(pl); }
+      pl.x = q[0]; pl.z = q[1]; pl.y = 0; pl.yaw = Math.PI / 2; pl.slot = null; pl.eng = false; setPalletPose(pl);
+    });
+    score();
+  }
+  function yawOf(q) { var v = new THREE.Vector3(0, 0, 1).applyQuaternion(q); return Math.atan2(v.x, v.z); }
+  function fold(a) { var h = Math.PI / 2; a = ((a % h) + h) % h; return a > h / 2 ? a - h : a; }
+  function onTarget(pl) {
+    if (pl.slot) return pl.slot;
+    if (pl.y !== 0) return null;
+    for (var n = 0; n < 3; n++) if (Math.abs(pl.x - goals[n].x) < 0.6 && Math.abs(pl.z - goals[n].z) < 0.6) return goals[n];
+    return null;
+  }
+  var taskEl = document.getElementById('nctf-task'), hintEl = document.getElementById('nctf-hint'), lastHint = '';
+  function hint(t) { if (t !== lastHint && hintEl) { lastHint = t; hintEl.textContent = t; } }
+  function score() {
+    var n = 0; goals.forEach(function (tg) { tg.hit = false; });
+    pallets.forEach(function (pl) { if (carry && carry.p === pl) return; var tg = onTarget(pl); if (tg) { tg.hit = true; n++; } });
+    goals.forEach(function (tg) { tg.mat.color.copy(lin(tg.hit ? 0xEED4E9 : 0xFB8E28)); });
+    if (taskEl) taskEl.textContent = pallets.length ? (n === pallets.length ? 'All ' + n + ' pallets placed. Reset the yard to go again.' : n + ' of ' + pallets.length + ' pallets placed') : 'Loading the yard';
+  }
+  // Where a carried pallet would come to rest if lowered here: a free rack slot, the floor, or nowhere (null)
+  function supportAt(x, z, h, self) {
+    for (var n = 0; n < SLOTS.length; n++) { var sl = SLOTS[n]; if (!sl.taken && Math.abs(x - sl.x) < 0.5 && Math.abs(z - sl.z) < 0.6 && h > sl.y - 0.25) return { y: sl.y, slot: sl }; }
+    if (z < -6.85) return null;
+    for (var k = 0; k < pallets.length; k++) { var o = pallets[k]; if (o !== self && o.y === 0 && Math.abs(o.x - x) < 1.15 && Math.abs(o.z - z) < 1.15) return null; }
+    return { y: 0, slot: null };
+  }
+  function forkWork(m) {
+    if (!m.forkRef || !pallets.length) { hint(m.forkRef ? '' : 'This machine does not carry pallets. Drive it and work its controls.'); return; }
+    m.g.updateMatrixWorld(true); m.forkRef.getWorldPosition(fp); m.forkRef.getWorldQuaternion(fq);
+    var fy = yawOf(fq), h = fp.y - m.y0, T = m.liftT;
+    if (carry) {
+      var sup = supportAt(fp.x, fp.z, h, carry.p), pl = carry.p;
+      if (sup && h <= sup.y + T * 0.5 && h <= lastH + 0.0005) {        // lowered onto something: set it down
+        pl.y = sup.y; pl.yaw = fy + carry.off; pl.x = fp.x; pl.z = fp.z;
+        if (sup.slot) { pl.x = sup.slot.x; pl.z = sup.slot.z; pl.yaw = Math.round(pl.yaw / Math.PI) * Math.PI; sup.slot.taken = pl; pl.slot = sup.slot; }
+        setPalletPose(pl); pl.eng = true; carry = null; score(); hint('Pallet down. Reverse out, or raise the forks to lift it again.');
+      } else {
+        pl.o.position.copy(fp); pl.o.quaternion.copy(fq).multiply(new THREE.Quaternion().setFromAxisAngle(UP, carry.off));
+        hint(sup ? 'Carrying a pallet. Lower the forks to set it down.' : 'Carrying a pallet. There is no room to set it down here.');
+      }
+    } else {
+      var msg = 'Line the forks up with a pallet, drive in low, then raise them.';
+      for (var n = 0; n < pallets.length; n++) {
+        var q = pallets[n], d = Math.sqrt((fp.x - q.x) * (fp.x - q.x) + (fp.z - q.z) * (fp.z - q.z)), ok = d < 0.36 && Math.abs(fold(fy - q.yaw)) < 0.32;
+        if (ok && h >= q.y - 0.05 && h <= q.y + T) q.eng = true; else if (!ok || h < q.y - 0.05) q.eng = false;
+        if (q.eng && ok) msg = 'Forks are in. Raise them to lift the pallet.';
+        else if (d < 1.4 && Math.abs(h - q.y) > T + 0.05 && d > 0.36) msg = h > q.y ? 'Forks are too high for this pallet. Lower them first.' : 'Raise the forks to the height of this pallet.';
+        if (q.eng && ok && h > q.y + T) {
+          if (q.slot) { q.slot.taken = null; q.slot = null; }
+          carry = { p: q, off: Math.round((q.yaw - fy) / (Math.PI / 2)) * (Math.PI / 2) }; q.eng = false; score(); break;
+        }
+      }
+      if (!carry) hint(msg);
+    }
+    lastH = h;
+  }
+  var resetBtn = document.getElementById('nctf-reset-yard'); if (resetBtn) resetBtn.addEventListener('click', function () { resetYard(); park(); });
+
 
   var models = {};
   function cbRear(g, z) {   // shared rear half of a counterbalance-style truck; z is the centre of the hood
@@ -401,8 +489,11 @@
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var dragging = false, lastX = 0, lastY = 0, dirty = true, shown = null, keys = { f: 0, b: 0, l: 0, r: 0 }, steer = 0, dir = 1, pedal = 0, speed = 0, thr = 0;
   function ease(v) { return v * v * (3 - 2 * v); }
+  var zoom = 1;
+  [['nctf-zoom-in', 0.85], ['nctf-zoom-out', 1.18]].forEach(function (z) { var b = document.getElementById(z[0]); if (b) b.addEventListener('click', function () { zoom = Math.max(0.5, Math.min(1.6, zoom * z[1])); }); });
   function place() {
-    var d = dist * wide; target.y = ty;
+    var d = dist * wide * 1.75 * zoom; target.y = ty;
+    if (shown) { target.x += (shown.g.position.x * 0.8 - target.x) * 0.08; target.z += (shown.g.position.z * 0.8 + 0.3 - target.z) * 0.08; }
     camera.position.set(target.x + d * Math.sin(az) * Math.cos(el), target.y + d * Math.sin(el), target.z + d * Math.cos(az) * Math.cos(el));
     camera.lookAt(target);
   }
@@ -472,9 +563,10 @@
   document.getElementById('nctf-park').addEventListener('click', function () { park(); targets = [0, 0]; stroke = 0; });
   onSelect = function () {
     var t = TRUCKS[current];
+    if (carry) { var cp = carry.p; cp.x = cp.o.position.x; cp.z = cp.o.position.z; cp.y = 0; cp.yaw = yawOf(cp.o.quaternion); setPalletPose(cp); carry = null; score(); }
     if (shown) shown.g.visible = false;
     shown = models[t.key]; shown.g.visible = true;
-    park(); dist = t.d; ty = t.ty; az = t.az === undefined ? -0.75 : t.az; el = 0.34; dirty = true;
+    park(); dist = t.d; ty = t.ty; az = -0.75; el = 0.5; dirty = true;
     if (!t.asked && typeof loadModel === 'function') loadModel(t);
   };
   onSelect();
@@ -483,7 +575,7 @@
   function loadModel(t) {
     if (!THREE.GLTFLoader || t.asked) return;
     t.asked = true;
-    new THREE.GLTFLoader().load((CFG.models || 'models/') + t.key + '.glb', function (g) {
+    new THREE.GLTFLoader().load((CFG.models || 'models/') + t.key + (CFG.ext || '.glb'), function (g) {
       g.scene.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       var mixer = new THREE.AnimationMixer(g.scene);
       var acts = g.animations.map(function (c) {
@@ -503,12 +595,31 @@
         acts.forEach(function (x) { x.a.time = Math.min(x.d * ease(v[x.i] || 0), x.d - 0.0001); }); mixer.update(0);
       } };
       if (t.gd) { t.d = t.gd; t.ty = t.gty; }
+      // The model was built with a pallet on its forks. Hide that one and remember its position on the forks instead.
+      var baked = [], prim = null;
+      g.scene.traverse(function (o) { if (PAL_RE.test(o.name)) { baked.push(o); if (!prim && /^(pallet|pal|pal_front)$/.test(o.name)) prim = o; } });
+      if (prim) {
+        m.pose([0, 0]); g.scene.updateMatrixWorld(true);
+        if (!proto && t.key === 'counter') { proto = new THREE.Group(); prim.children.forEach(function (c) { proto.add(c.clone(true)); }); }
+        var carrier = prim.parent && prim.parent !== g.scene ? prim.parent : g.scene.getObjectByName('forks');
+        if (carrier) {
+          var ref = new THREE.Object3D(), mm = new THREE.Matrix4();
+          mm.copy(carrier.matrixWorld).invert().multiply(prim.matrixWorld); mm.decompose(ref.position, ref.quaternion, ref.scale); ref.scale.set(1, 1, 1);
+          carrier.add(ref); g.scene.updateMatrixWorld(true);
+          var w0 = new THREE.Vector3(), w1 = new THREE.Vector3(); ref.getWorldPosition(w0);
+          m.pose([1, 0]); g.scene.updateMatrixWorld(true); ref.getWorldPosition(w1); m.pose([0, 0]);
+          m.forkRef = ref; m.y0 = w0.y; m.liftT = Math.max(0.02, Math.min(0.06, (w1.y - w0.y) * 0.4));
+          m.zMin = Math.max(-6.7, Math.min(-5.0, -7.6 + Math.abs(w0.z) - 0.05));
+        }
+        baked.forEach(function (o) { o.visible = false; });
+      }
       g.scene.visible = false; scene.add(g.scene);
+      if (proto && !pallets.length) resetYard();
       var old = models[t.key]; models[t.key] = m;
       if (shown === old) { old.g.visible = false; shown = m; m.g.visible = true; dist = t.d; ty = t.ty; dirty = true; }
     }, undefined, function () {});
   }
-  loadModel(TRUCKS[current]);
+  loadModel(TRUCKS[0]); if (current) loadModel(TRUCKS[current]);
 
   var last = performance.now();
   function frame(now) {
@@ -536,7 +647,7 @@
         var fx = gp.position.x + Math.sin(h) * a + Math.sin(h) * speed * dt, fz = gp.position.z + Math.cos(h) * a + Math.cos(h) * speed * dt;
         h -= speed * Math.tan(steer * 1.05) / L * dt;
         var nx = fx - Math.sin(h) * a, nz = fz - Math.cos(h) * a;
-        if (Math.abs(nx) < 2.9 && nz > -3.3 && nz < 3.5) {
+        if (Math.abs(nx) < YARD.x && nz > (shown.zMin || -5.6) && nz < YARD.zMax) {
           gp.position.x = nx; gp.position.z = nz; gp.rotation.y = h;
           (shown.wheels || []).forEach(function (w) { w.o.rotateY(speed * dt / w.r); });
         } else speed = 0;
@@ -544,10 +655,11 @@
       }
       var mph = Math.abs(speed) * 2.237, sp = document.getElementById('nctf-speed'), txt = mph.toFixed(1); if (sp.textContent !== txt) sp.textContent = txt;
     }
-    if (dirty) { if (shown.multi) shown.pose(vals); else shown.pose(ease(vals[0])); place(); renderer.render(scene, camera); dirty = false; }
+    if (shown.multi) shown.pose(vals); else shown.pose(ease(vals[0]));
+    forkWork(shown); place(); renderer.render(scene, camera); dirty = false;
     requestAnimationFrame(frame);
   }
   shown.pose(shown.multi ? vals : 0); place(); renderer.render(scene, camera);
   requestAnimationFrame(frame);
-  window.__nctf = { pick: show, work: function (a, b) { targets = [a, b === undefined ? a : b]; vals = targets.slice(); dirty = true; }, key: function (k, v) { keys[k] = v; }, drive: function (d, p, st) { setDir(d); setPedal(p); setSteer(st); }, thr: setThr, lever: function (n, d) { defl[n] = d; } };
+  window.__nctf = { yard: function () { return { carry: !!carry, placed: pallets.filter(function (pl) { return (!carry || carry.p !== pl) && onTarget(pl); }).length, pallets: pallets.map(function (pl) { return [+pl.o.position.x.toFixed(2), +pl.o.position.y.toFixed(2), +pl.o.position.z.toFixed(2)]; }), hint: lastHint, fork: shown && shown.forkRef ? [+fp.x.toFixed(2), +(fp.y - shown.y0).toFixed(2), +fp.z.toFixed(2)] : null }; }, truck: function (x, z, h) { shown.g.position.set(x, 0, z); shown.g.rotation.y = h; }, pick: show, work: function (a, b) { targets = [a, b === undefined ? a : b]; vals = targets.slice(); dirty = true; }, key: function (k, v) { keys[k] = v; }, drive: function (d, p, st) { setDir(d); setPedal(p); setSteer(st); }, thr: setThr, lever: function (n, d) { defl[n] = d; } };
 })();

@@ -1,9 +1,9 @@
 === NCT Truck Finder ===
 Requires at least: 5.8
 Requires PHP: 7.2
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 
-Interactive 3D "Which truck do you need training on?" selector for National Compliance Training.
+3D truck finder and truck simulator for National Compliance Training.
 
 == What it does ==
 
@@ -19,18 +19,32 @@ read how to recognise it, try its controls and go to the matching course page.
 
 To remove it from that page, deactivate the plugin. Nothing is written to the database or to the page's content.
 
-== Two views ==
+== Truck simulator page ==
 
-Showcase (the default): each truck stands on a turntable, as in the homepage hero. Visitors pick a truck, read
-how to recognise it, drag to turn it, and go to the course page. Each truck gently works through its own motion.
+While the plugin is active the site has a page at /truck-simulator/ (for example
+https://nationalcompliancetraining.co.uk/truck-simulator/). Visitors pick a truck, drive it round a yard with a
+steering wheel or tiller, pedal and hydraulic levers, and move four pallets into marked floor bays or two free
+rack positions. To lift a pallet: line the forks up, drive in with the forks low, raise them. To set it down: lower
+the forks. Scissor lift, boom lift and gantry crane can be driven and worked but do not carry pallets.
 
-Interactive: the same trucks in a marked bay with a steering wheel or tiller, pedal and hydraulic levers.
+The page is produced by the plugin; it is not stored in WordPress, so it does not appear under Pages and it
+disappears when the plugin is deactivated. It is not added to any menu: link to it wherever you like. The truck
+finder on the forklift training page has a "Try driving one" button that goes to it.
 
-To make interactive the default, add to the theme's functions.php:
+If you would rather have it inside a normal WordPress page, put the shortcode [nct_truck_simulator] in that page.
+A real page with the address /truck-simulator/ takes priority over the built-in one.
+
+To change the address, or switch the built-in page off, add to the theme's functions.php:
+
+    add_filter( 'nct_truck_simulator_slug', function () { return 'forklift-simulator'; } );   // new address
+    add_filter( 'nct_truck_simulator_slug', '__return_empty_string' );                         // off
+
+== Truck finder view ==
+
+The finder on the forklift training page shows each truck on a turntable, as in the homepage hero. To show the
+simulator there instead, use [nct_truck_finder mode="interactive"], or:
 
     add_filter( 'nct_truck_finder_mode', function () { return 'interactive'; } );
-
-Or choose per placement with the shortcode: [nct_truck_finder mode="interactive"] or [nct_truck_finder mode="showcase"].
 
 == Using it elsewhere ==
 

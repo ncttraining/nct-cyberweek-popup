@@ -40,6 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <p class="nctf-where" id="nctf-t-where"><b>Where you see it:</b> loading bays, yards and warehouses with wide aisles.</p>
       <div class="nctf-actions">
         <a class="nctf-btn nctf-btn-primary" href="<?php echo esc_url( home_url( '/courses/rtitb-counterbalance-courses/' ) ); ?>" id="nctf-t-link">See RTITB Counterbalance courses</a>
+        <?php if ( ! empty( $nctf_sim_url ) ) : ?><a class="nctf-btn nctf-btn-ghost" href="<?php echo esc_url( $nctf_sim_url ); ?>">Try driving one</a><?php endif; ?>
         <span class="nctf-callus">Still not sure? Call <a href="tel:02030264629"><b>020 3026 4629</b></a></span>
       </div>
     </div>
