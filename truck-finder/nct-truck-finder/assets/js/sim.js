@@ -321,34 +321,39 @@
   }
   // Solid things: the truck body, its forks and a carried pallet cannot pass through pallets or racking.
   // Forks may only enter a pallet at the right height and roughly square on, and only enter the racking at a free position.
-  var bumpAt = 0;
+  var bumpAt = 0, blockedFor = 0;
+  // Returns null when nothing is touching, otherwise what is touching and a function giving how far apart the two are,
+  // so a move can be judged as heading into the obstacle (refused) or away from it (always allowed).
   function collide(m) {
-    var gp = m.g.position, hd = m.g.rotation.y, sn = Math.sin(hd), cs = Math.cos(hd), b = m.body, k, n, q, dx, dz;
+    var gp = m.g.position, b = m.body, k, n, q;
+    function circ(kk) { var hd = m.g.rotation.y; return [gp.x + Math.sin(hd) * b.zs[kk], gp.z + Math.cos(hd) * b.zs[kk]]; }
+    function fork() { m.g.updateMatrixWorld(true); m.forkRef.getWorldPosition(fp); return fp; }
     if (b) for (k = 0; k < b.zs.length; k++) {
-      var cx = gp.x + sn * b.zs[k], cz = gp.z + cs * b.zs[k];
-      if (cz - b.r < RACK_Z) return true;
+      var c = circ(k);
+      if (c[1] - b.r < RACK_Z) return (function (kk) { return function () { return circ(kk)[1]; }; })(k);
       for (n = 0; n < pallets.length; n++) {
         q = pallets[n]; if ((carry && carry.p === q) || q.y > 0.5) continue;
-        dx = cx - q.x; dz = cz - q.z; if (dx * dx + dz * dz < (b.r + 0.56) * (b.r + 0.56)) return true;
+        var dx = c[0] - q.x, dz = c[1] - q.z;
+        if (dx * dx + dz * dz < (b.r + 0.56) * (b.r + 0.56)) return (function (kk, qq) { return function () { var cc = circ(kk); return Math.sqrt((cc[0] - qq.x) * (cc[0] - qq.x) + (cc[1] - qq.z) * (cc[1] - qq.z)); }; })(k, q);
       }
     }
     if (m.forkRef) {
-      m.g.updateMatrixWorld(true); m.forkRef.getWorldPosition(fp); m.forkRef.getWorldQuaternion(fq);
+      fork(); m.forkRef.getWorldQuaternion(fq);
       var fy = yawOf(fq), h = fp.y - m.y0, T = m.liftT;
       for (n = 0; n < pallets.length; n++) {
         q = pallets[n]; if (carry && carry.p === q) continue;
-        dx = fp.x - q.x; dz = fp.z - q.z; var d2 = dx * dx + dz * dz;
-        if (carry) { if (d2 < 1.21 && Math.abs(h - q.y) < 1.0) return true; }
-        else if (d2 < 0.85 && h < q.y + 1.0 && h > q.y - 0.08 && !(h <= q.y + T + 0.12 && Math.abs(fold(fy - q.yaw)) < 0.4)) return true;
+        var ex = fp.x - q.x, ez = fp.z - q.z, d2 = ex * ex + ez * ez, hit = false;
+        if (carry) hit = d2 < 1.21 && Math.abs(h - q.y) < 1.0;
+        else hit = d2 < 0.85 && h < q.y + 1.0 && h > q.y - 0.08 && !(h <= q.y + T + 0.12 && Math.abs(fold(fy - q.yaw)) < 0.4);
+        if (hit) { var tf = (function (qq) { return function () { var f = fork(); return Math.sqrt((f.x - qq.x) * (f.x - qq.x) + (f.z - qq.z) * (f.z - qq.z)); }; })(q); tf.fork = true; return tf; }
       }
       if (fp.z - 0.5 < RACK_Z) {
-        if (fp.z < -7.95) return true;
-        var ok = false;
-        for (n = 0; n < SLOTS.length; n++) if (Math.abs(fp.x - SLOTS[n].x) < 0.5 && h >= SLOTS[n].y - 0.08 && h <= SLOTS[n].y + 0.4) ok = true;
-        if (!ok) return true;
+        var ok = fp.z >= -7.95;
+        if (ok) { ok = false; for (n = 0; n < SLOTS.length; n++) if (Math.abs(fp.x - SLOTS[n].x) < 0.5 && h >= SLOTS[n].y - 0.08 && h <= SLOTS[n].y + 0.4) ok = true; }
+        if (!ok) { var tr = function () { return fork().z; }; tr.fork = true; return tr; }
       }
     }
-    return false;
+    return null;
   }
   function forkWork(m) {
     if (!m.forkRef || !pallets.length) { hint(m.forkRef ? '' : 'This machine does not carry pallets. Drive it and work its controls.'); return; }
@@ -362,10 +367,10 @@
         setPalletPose(pl); pl.eng = true; carry = null; score(); hint('Pallet down. Reverse out, or raise the forks to lift it again.');
       } else {
         pl.o.position.copy(fp); pl.o.quaternion.copy(fq).multiply(new THREE.Quaternion().setFromAxisAngle(UP, carry.off));
-        hint(performance.now() - bumpAt < 900 ? 'Something is in the way.' : sup ? 'Carrying a pallet. Lower the forks to set it down.' : 'Carrying a pallet. There is no room to set it down here.');
+        hint(performance.now() - bumpAt < 900 ? (blockedFor > 1.2 ? 'Blocked. Reverse away, or press Recover truck.' : 'Something is in the way.') : sup ? 'Carrying a pallet. Lower the forks to set it down.' : 'Carrying a pallet. There is no room to set it down here.');
       }
     } else {
-      var msg = performance.now() - bumpAt < 900 ? 'Something is in the way. Check the fork height and line up square.' : 'Line the forks up with a pallet, drive in low, then raise them.';
+      var msg = performance.now() - bumpAt < 900 ? (blockedFor > 1.2 ? 'Blocked. Reverse away, or press Recover truck.' : 'Something is in the way. Check the fork height and line up square.') : 'Line the forks up with a pallet, drive in low, then raise them.';
       for (var n = 0; n < pallets.length; n++) {
         var q = pallets[n], d = Math.sqrt((fp.x - q.x) * (fp.x - q.x) + (fp.z - q.z) * (fp.z - q.z)), ok = d < 0.36 && Math.abs(fold(fy - q.yaw)) < 0.32;
         if (ok && h >= q.y - 0.05 && h <= q.y + T) q.eng = true; else if (!ok || h < q.y - 0.05) q.eng = false;
@@ -593,7 +598,15 @@
   canvas.addEventListener('keydown', function (e) { if (arrows[e.key]) { keys[arrows[e.key]] = 1; e.preventDefault(); } });
   canvas.addEventListener('keyup', function (e) { if (arrows[e.key]) keys[arrows[e.key]] = 0; });
   canvas.addEventListener('blur', function () { keys.f = keys.b = keys.l = keys.r = 0; });
-  function park() { if (shown) { shown.g.position.set(0, 0, 0); shown.g.rotation.y = 0; } speed = 0; setSteer(0); setDir(1); dirty = true; }
+  function park() {
+    speed = 0; setSteer(0); setDir(1); dirty = true; blockedFor = 0;
+    if (!shown) return;
+    var spots = [[0, 0.5], [0, 3.5], [-2, 2], [2, 2], [0, -2.5], [-2, 5], [2, 5]];
+    for (var n = 0; n < spots.length; n++) {      // the first parking spot with nothing in it
+      shown.g.position.set(spots[n][0], 0, spots[n][1]); shown.g.rotation.y = 0;
+      if (!shown.multi || !pallets.length || !collide(shown)) break;
+    }
+  }
   document.getElementById('nctf-park').addEventListener('click', function () { park(); targets = [0, 0]; stroke = 0; });
   onSelect = function () {
     var t = TRUCKS[current];
@@ -675,7 +688,7 @@
   var last = performance.now();
   function frame(now) {
     var dt = Math.min(0.1, (now - last) / 1000); last = now;
-    var was = shown.multi ? collide(shown) : true, sx0 = shown.g.position.x, sz0 = shown.g.position.z, sh0 = shown.g.rotation.y, t0v = targets.slice(), v0v = vals.slice();
+    var was = shown.multi ? !!collide(shown) : true, sx0 = shown.g.position.x, sz0 = shown.g.position.z, sh0 = shown.g.rotation.y, t0v = targets.slice(), v0v = vals.slice();
     var T = TRUCKS[current], n;
     // Hydraulic levers: how far a lever is held sets how fast that function moves; let go and it stays where it is
     for (n = 0; n < T.controls.length; n++) {
@@ -708,14 +721,23 @@
       var mph = Math.abs(speed) * 2.237, sp = document.getElementById('nctf-speed'), txt = mph.toFixed(1); if (sp.textContent !== txt) sp.textContent = txt;
     }
     if (shown.multi) shown.pose(vals); else shown.pose(ease(vals[0]));
-    if (!was && collide(shown)) {            // this frame's move would go through something: undo it
-      shown.g.position.x = sx0; shown.g.position.z = sz0; shown.g.rotation.y = sh0; speed = 0; bumpAt = now;
-      if (collide(shown)) { targets = t0v; vals = v0v; shown.pose(vals); }
-    }
+    var touch = shown.multi ? collide(shown) : null;
+    if (touch) {
+      var gpp = shown.g, nx1 = gpp.position.x, nz1 = gpp.position.z, nh1 = gpp.rotation.y, moved = nx1 !== sx0 || nz1 !== sz0 || nh1 !== sh0, refuse = false;
+      if (moved) {                           // heading into it is refused; backing away from it is always allowed
+        var dNew = touch(); gpp.position.x = sx0; gpp.position.z = sz0; gpp.rotation.y = sh0;
+        var dOld = touch();
+        var backing = (nx1 - sx0) * Math.sin(sh0) + (nz1 - sz0) * Math.cos(sh0) < 0;   // forks drawn straight back always come free
+        if (dNew < dOld - 0.00001 && !(touch.fork && backing)) { refuse = true; speed = 0; bumpAt = now; }
+        else { gpp.position.x = nx1; gpp.position.z = nz1; gpp.rotation.y = nh1; }
+      }
+      if (!was && (!moved || refuse) && collide(shown)) { targets = t0v; vals = v0v; shown.pose(vals); bumpAt = now; }   // a lever move that would push through something
+      blockedFor = refuse ? blockedFor + dt : 0;
+    } else blockedFor = 0;
     forkWork(shown); place(); renderer.render(scene, camera); dirty = false;
     requestAnimationFrame(frame);
   }
   shown.pose(shown.multi ? vals : 0); place(); renderer.render(scene, camera);
   requestAnimationFrame(frame);
-  window.__nctf = { hit: function () { return collide(shown); }, where: function () { return [shown.g.position.x, shown.g.position.z, shown.g.rotation.y]; }, yard: function () { return { carry: !!carry, placed: pallets.filter(function (pl) { return (!carry || carry.p !== pl) && onTarget(pl); }).length, pallets: pallets.map(function (pl) { return [+pl.o.position.x.toFixed(2), +pl.o.position.y.toFixed(2), +pl.o.position.z.toFixed(2)]; }), hint: lastHint, fork: shown && shown.forkRef ? [+fp.x.toFixed(2), +(fp.y - shown.y0).toFixed(2), +fp.z.toFixed(2)] : null }; }, truck: function (x, z, h) { shown.g.position.set(x, 0, z); shown.g.rotation.y = h; }, pick: show, work: function (a, b) { targets = [a, b === undefined ? a : b]; vals = targets.slice(); dirty = true; }, key: function (k, v) { keys[k] = v; }, drive: function (d, p, st) { setDir(d); setPedal(p); setSteer(st); }, thr: setThr, lever: function (n, d) { defl[n] = d; } };
+  window.__nctf = { hit: function () { return !!collide(shown); }, where: function () { return [shown.g.position.x, shown.g.position.z, shown.g.rotation.y]; }, yard: function () { return { carry: !!carry, placed: pallets.filter(function (pl) { return (!carry || carry.p !== pl) && onTarget(pl); }).length, pallets: pallets.map(function (pl) { return [+pl.o.position.x.toFixed(2), +pl.o.position.y.toFixed(2), +pl.o.position.z.toFixed(2)]; }), hint: lastHint, fork: shown && shown.forkRef ? [+fp.x.toFixed(2), +(fp.y - shown.y0).toFixed(2), +fp.z.toFixed(2)] : null }; }, truck: function (x, z, h) { shown.g.position.set(x, 0, z); shown.g.rotation.y = h; }, pick: show, work: function (a, b) { targets = [a, b === undefined ? a : b]; vals = targets.slice(); dirty = true; }, key: function (k, v) { keys[k] = v; }, drive: function (d, p, st) { setDir(d); setPedal(p); setSteer(st); }, thr: setThr, lever: function (n, d) { defl[n] = d; } };
 })();

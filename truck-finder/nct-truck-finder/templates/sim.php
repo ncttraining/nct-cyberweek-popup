@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <div class="nctf-levers" id="nctf-levers">
         <div class="nctf-hlever"><div class="nctf-slot" id="nctf-lever-0" role="slider" tabindex="0" aria-label="Lift" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="nctf-knob"></span></div><span class="nctf-hl-name">Lift</span><span class="nctf-hl-val" id="nctf-lever-0-out">0%</span></div>
       </div>
-      <div class="nctf-dash-end"><button type="button" class="nctf-ctl" id="nctf-park">Reset</button></div>
+      <div class="nctf-dash-end"><button type="button" class="nctf-ctl" id="nctf-park">Recover truck</button></div>
     </div>
 </div>
 <div class="nctf-sim-info" aria-live="polite">

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: NCT Truck Finder
  * Description: 3D truck finder and simulator. Shows each truck on a turntable at the top of the forklift training page, and adds a Truck simulator page at /truck-simulator/ where visitors drive the trucks and move pallets. Shortcodes: [nct_truck_finder] and [nct_truck_simulator].
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: National Compliance Training
  * Text Domain: nct-truck-finder
  * Requires at least: 5.8
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class NCT_Truck_Finder {
 
-	const VERSION = '1.3.0';
+	const VERSION = '1.3.1';
 
 	/** Only one finder can be on a page: its element ids are unique. */
 	private $rendered = false;

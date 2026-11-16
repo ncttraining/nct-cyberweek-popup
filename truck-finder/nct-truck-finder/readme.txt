@@ -1,7 +1,7 @@
 === NCT Truck Finder ===
 Requires at least: 5.8
 Requires PHP: 7.2
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 
 3D truck finder and truck simulator for National Compliance Training.
 
@@ -31,6 +31,9 @@ Trucks, forks and carried pallets are solid: they stop at pallets and at the rac
 the right height and roughly square on, and only into the racking at a free position. The counterbalance, reach,
 pivot steer, VNA and high-level order picker lift to about 4 m and reach the top beam; the pallet trucks and the
 low-level order picker work at floor level only.
+
+A truck that is touching something can always back away from it, and reversing always draws the forks out. The
+"Recover truck" button on the control panel parks the truck in a clear part of the yard with the forks down.
 
 The page is produced by the plugin; it is not stored in WordPress, so it does not appear under Pages and it
 disappears when the plugin is deactivated. It is not added to any menu: link to it wherever you like. The truck
