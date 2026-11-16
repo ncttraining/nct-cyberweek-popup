@@ -5,7 +5,7 @@ from wh_common import *
 reset()
 R = math.radians
 W = 0.65
-LIFT = 2.3
+LIFT = 3.9
 
 # ================= chassis =================
 # rear frame slab under battery + drive unit
@@ -192,15 +192,15 @@ pallet("pal", (FX, -0.72, 0.105), tur)
 PZ = MT - 0.03
 for sx in (-1, 1):
     cf = chain("chain_f", 1.0, (sx * 0.255, MY - 0.09, 1.85), lift, width=0.04)
-    key(cf, FRAME_REST, scale=(1, 1, PZ - 1.85)); key(cf, FRAME_WORK, scale=(1, 1, PZ + 1.15 - 1.85 - LIFT))
+    key(cf, FRAME_REST, scale=(1, 1, PZ - 1.85)); key(cf, FRAME_WORK, scale=(1, 1, max(0.02, PZ + 2.0 - 1.85 - LIFT)))
     cr = chain("chain_r", 1.0, (sx * 0.255, MY + 0.05, 3.2), None, width=0.04)
-    key(cr, FRAME_REST, scale=(1, 1, PZ - 3.2)); key(cr, FRAME_WORK, scale=(1, 1, PZ + 1.15 - 3.2))
+    key(cr, FRAME_REST, scale=(1, 1, PZ - 3.2)); key(cr, FRAME_WORK, scale=(1, 1, PZ + 2.0 - 3.2))
 box("chain_anchor", (0.62, 0.03, 0.05), (0, MY + 0.05, 3.2), "mast", 0.006)
 box("chain_lug", (0.62, 0.04, 0.05), (0, MY - 0.1, 1.85), "chassis", 0.006, lift)
 
 # ================= motion =================
 key(lift, FRAME_REST, loc=(0, 0, 0)); key(lift, FRAME_WORK, loc=(0, 0, LIFT))
-key(inn, FRAME_REST, loc=(0, 0, 0)); key(inn, FRAME_WORK, loc=(0, 0, 1.15))
+key(inn, FRAME_REST, loc=(0, 0, 0)); key(inn, FRAME_WORK, loc=(0, 0, 2.0))
 key(tur, FRAME_REST, rot=(0, 0, 0)); key(tur, FRAME_WORK, rot=(0, 0, R(-90)))
 
 export(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "vna.glb"))

@@ -196,17 +196,17 @@ PZ = 1.39 + 0.055
 for sx in (-1, 1):
     cf = chain("chain_f", 1.0, (sx * 0.075, 0.05, 0.55), car)          # carriage -> pulley
     key(cf, FRAME_REST, scale=(1, 1, (PZ - (CZ + 0.55)) / 1.0))
-    key(cf, FRAME_WORK, scale=(1, 1, max(0.02, (PZ + 1.2 + 0.55 - (CZ + 0.55 + 2.3)) / 1.0)))
+    key(cf, FRAME_WORK, scale=(1, 1, max(0.02, (PZ + 2.2 + 1.2 - (CZ + 0.55 + 3.9)) / 1.0)))
     cr = chain("chain_r", 1.0, (sx * 0.075, 0.055, 0.9), inn)            # anchor on cylinder -> pulley
     key(cr, FRAME_REST, scale=(1, 1, PZ - 0.9))
-    key(cr, FRAME_WORK, scale=(1, 1, PZ + 0.55 - 0.9))
+    key(cr, FRAME_WORK, scale=(1, 1, PZ + 1.2 - 0.9))
 box("chain_anchor", (0.22, 0.03, 0.04), (0, 0.045, 0.9), "mast", 0.006, inn)
 
 # ---------------- motion ----------------
 key(reach, FRAME_REST, loc=(0, YM, 0)); key(reach, FRAME_WORK, loc=(0, YM - 0.6, 0))
-key(mid, FRAME_REST, loc=(0, 0, 0)); key(mid, FRAME_WORK, loc=(0, 0, 0.6))
-key(inn, FRAME_REST, loc=(0, 0, 0)); key(inn, FRAME_WORK, loc=(0, 0, 1.2))
-key(pul, FRAME_REST, loc=(0, 0, 0)); key(pul, FRAME_WORK, loc=(0, 0, 0.55))
-key(car, FRAME_REST, loc=(0, -0.105, CZ)); key(car, FRAME_WORK, loc=(0, -0.105, CZ + 2.3))
+key(mid, FRAME_REST, loc=(0, 0, 0)); key(mid, FRAME_WORK, loc=(0, 0, 1.1))
+key(inn, FRAME_REST, loc=(0, 0, 0)); key(inn, FRAME_WORK, loc=(0, 0, 2.2))
+key(pul, FRAME_REST, loc=(0, 0, 0)); key(pul, FRAME_WORK, loc=(0, 0, 1.2))
+key(car, FRAME_REST, loc=(0, -0.105, CZ)); key(car, FRAME_WORK, loc=(0, -0.105, CZ + 3.9))
 
 export(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "reach.glb"))

@@ -55,7 +55,7 @@ for sx in (-1, 1):
     wheel("w_front", RFW, 0.18, (sx * 0.46, -0.30, RFW), rim="rim", parent=front)
     tilt_cylinder(front, (sx * 0.335, -0.26, 0.44), (sx * 0.36, -0.465, 0.86), r=0.03)
     box("tilt_brk", (0.05, 0.08, 0.1), (sx * 0.325, -0.25, 0.42), "chassis", bevel=0.01, parent=front)
-inner, car = mast(front, yc=-0.52, zb=0.12, top=2.15, lift=0.45)
+inner, car = mast(front, yc=-0.52, zb=0.12, top=2.75, lift=4.0)
 key(front, FRAME_REST, rot=(0, 0, 0)); key(front, FRAME_WORK, rot=(0, 0, SWING))
 
 export(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "pivot.glb"))

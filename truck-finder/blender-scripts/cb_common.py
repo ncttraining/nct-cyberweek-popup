@@ -358,7 +358,7 @@ def mast(parent, yc=-0.73, zb=0.12, top=2.13, lift=1.55, xr=0.315, fork_z=0.03, 
         Lf = zp - (fork_z + 0.50)
         ef = empty("chain_front_%d" % sx, (x, yc - rp - 0.005, zp), inner)
         box("chain_f", (0.028, 0.012, Lf), (0, 0, -Lf / 2), "steel", bevel=0, parent=ef)
-        key(ef, FRAME_REST, scale=(1, 1, 1)); key(ef, FRAME_WORK, scale=(1, 1, (Lf - lift / 2) / Lf))
+        key(ef, FRAME_REST, scale=(1, 1, 1)); key(ef, FRAME_WORK, scale=(1, 1, max(0.02, (Lf - lift / 2) / Lf)))
         Lr = zp - (zb + 1.17)
         er = empty("chain_rear_%d" % sx, (x, yc + rp + 0.005, zp), inner)
         box("chain_r", (0.028, 0.012, Lr), (0, 0, -Lr / 2), "steel", bevel=0, parent=er)

@@ -40,7 +40,7 @@ cowl(None, yf=-0.60, zf=0.50, hw=0.27)
 guard(None, front_foot=(0.485, -0.60, 0.72), roof_front=(0.50, -0.22), roof_rear_y=0.95, roof_z=2.12, rear_foot=(0.50, 1.02, 1.06))
 
 # ---- mast and tilt cylinders
-inner, car = mast(None, yc=-0.73, zb=0.12, top=2.13, lift=1.55)
+inner, car = mast(None, yc=-0.73, zb=0.12, top=2.75, lift=4.0)
 for sx in (-1, 1):
     tilt_cylinder(None, (sx * 0.335, -0.30, 0.58), (sx * 0.36, -0.675, 0.86))
     box("tilt_brk", (0.05, 0.08, 0.12), (sx * 0.335, -0.29, 0.54), "chassis", bevel=0.01)

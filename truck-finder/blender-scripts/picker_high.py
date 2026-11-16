@@ -6,8 +6,8 @@ reset()
 R = math.radians
 
 W = 0.50            # half width of the chassis
-LIFT = 2.3          # platform rise
-INN = 1.15          # inner mast stage rise
+LIFT = 3.9          # platform rise
+INN = 2.2           # inner mast stage rise
 MY = 0.62           # mast centre (y)
 MT = 2.78           # top of the outer mast
 Y0, Y1 = 0.74, 1.38  # drive / battery unit front and back
@@ -209,7 +209,7 @@ PZ = MT - 0.1
 CA, RA = 1.42, 1.9           # carriage anchor (local to lift), outer-mast anchor
 for sx in (-1, 1):
     cf = chain("chain_f", 1.0, (sx * 0.245, MY - 0.07, CA), lift, width=0.035)
-    key(cf, FRAME_REST, scale=(1, 1, PZ - CA)); key(cf, FRAME_WORK, scale=(1, 1, PZ + INN - CA - LIFT))
+    key(cf, FRAME_REST, scale=(1, 1, PZ - CA)); key(cf, FRAME_WORK, scale=(1, 1, max(0.02, PZ + INN - CA - LIFT)))
     cr = chain("chain_r", 1.0, (sx * 0.245, MY + 0.05, RA), None, width=0.035)
     key(cr, FRAME_REST, scale=(1, 1, PZ - RA)); key(cr, FRAME_WORK, scale=(1, 1, PZ + INN - RA))
 box("chain_anchor", (0.6, 0.03, 0.045), (0, MY + 0.06, RA), "mast", 0.006)

@@ -1,7 +1,7 @@
 === NCT Truck Finder ===
 Requires at least: 5.8
 Requires PHP: 7.2
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 
 3D truck finder and truck simulator for National Compliance Training.
 
@@ -23,9 +23,14 @@ To remove it from that page, deactivate the plugin. Nothing is written to the da
 
 While the plugin is active the site has a page at /truck-simulator/ (for example
 https://nationalcompliancetraining.co.uk/truck-simulator/). Visitors pick a truck, drive it round a yard with a
-steering wheel or tiller, pedal and hydraulic levers, and move four pallets into marked floor bays or two free
-rack positions. To lift a pallet: line the forks up, drive in with the forks low, raise them. To set it down: lower
+steering wheel or tiller, pedal and hydraulic levers, and move four pallets into marked floor bays or four free
+rack positions (floor level and each of the three beams, the top one at about 3.7 m). To lift a pallet: line the forks up, drive in with the forks low, raise them. To set it down: lower
 the forks. Scissor lift, boom lift and gantry crane can be driven and worked but do not carry pallets.
+
+Trucks, forks and carried pallets are solid: they stop at pallets and at the racking. Forks only go into a pallet at
+the right height and roughly square on, and only into the racking at a free position. The counterbalance, reach,
+pivot steer, VNA and high-level order picker lift to about 4 m and reach the top beam; the pallet trucks and the
+low-level order picker work at floor level only.
 
 The page is produced by the plugin; it is not stored in WordPress, so it does not appear under Pages and it
 disappears when the plugin is deactivated. It is not added to any menu: link to it wherever you like. The truck
